@@ -57,24 +57,12 @@ def getMatches(soup):
     return matches
 
 
-def display(matches):
-    #matches = json.loads(matches)
-    message = {
-            "text": "Live report of all matches",
-            "attachments": [
-                matches
-            ]
-        }
-    return message
-    #return json.dumps(message)
-
 @sched.scheduled_job('interval', minutes=1)
 @app.route('/', methods=['GET', 'POST'])
 def main():
     soup = getHTML(URL)
     matches = getMatches(soup)
-    results = display(matches)
-    results = json.dumps(results, indent=4, sort_keys=True)
+    results = json.dumps(matches, indent=4, sort_keys=True)
     return results
 
 if __name__ == '__main__':
