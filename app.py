@@ -75,7 +75,7 @@ def main():
     soup = getHTML(URL)
     matches = getMatches(soup)
     results = display(matches)
-    results = json.dumps(message, indent=4, sort_keys=True)
+    results = json.dumps(results, indent=4, sort_keys=True)
     return results
     #else:
     #    return "Invalid command"
