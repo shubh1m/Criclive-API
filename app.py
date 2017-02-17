@@ -5,12 +5,13 @@ import requests
 import json
 import os
 import time
-from flask.json import jsonify
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 app = Flask(__name__)
+sched = BlockingScheduler()
 
-TOKEN = "1n4NyiVvw9EPmc1YtnzfLi3D"
 URL = "http://www.espncricinfo.com/ci/engine/match/index.html?view=live"
+
 
 def getHTML(url):
     html_doc = requests.get(url).text
@@ -67,19 +68,16 @@ def display(matches):
     return message
     #return json.dumps(message)
 
-
+@sched.scheduled_job('interval', minutes=1)
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    #token = request.values.get('token')
-    #if TOKEN == token:
     soup = getHTML(URL)
     matches = getMatches(soup)
     results = display(matches)
     results = json.dumps(results, indent=4, sort_keys=True)
     return results
-    #else:
-    #    return "Invalid command"
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+    sched.start()
