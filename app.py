@@ -76,8 +76,7 @@ def main():
     matches = getMatches(soup)
     results = display(matches)
     results = json.dumps(results, indent=4, sort_keys=True)
-    print(results)
-    #return results
+    return results
     #else:
     #    return "Invalid command"
 
