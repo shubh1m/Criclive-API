@@ -5,12 +5,13 @@ import requests
 import json
 import os
 import time
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
-sched = BlockingScheduler()
+sched = BackgroundScheduler()
 
 URL = "http://www.espncricinfo.com/ci/engine/match/index.html?view=live"
+BASE_URL = "http://www.espncricinfo.com"
 
 
 def getHTML(url):
@@ -49,7 +50,8 @@ def getMatches(soup):
                     "name": match.find("div", "innings-info-2").contents[0].strip(),
                     "score": match.find("div", "innings-info-2").contents[1].string
                     },
-                "status": match.find("div", "match-status").find("span", "bold").string
+                "status": match.find("div", "match-status").find("span", "bold").string,
+                "url": BASE_URL + match.find("span", "match-no").find("a").get("href")
                 }
             details["matches"].append(det)
         matches["data"].append(details)
@@ -65,7 +67,8 @@ def main():
     results = json.dumps(matches, indent=4, sort_keys=True)
     return results
 
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+    sched.start()
     app.run(host='0.0.0.0', port=port)
-    start()
