@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import os
-from time import gmtime
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
@@ -87,5 +86,4 @@ def main():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run()
     app.run(host='0.0.0.0', port=port)
