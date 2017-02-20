@@ -4,11 +4,15 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import os
-import time
+from time import gmtime
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 sched = BackgroundScheduler()
+sched.start()
+results = None
+previous_results = None
+
 
 URL = "http://www.espncricinfo.com/ci/engine/match/index.html?view=live"
 BASE_URL = "http://www.espncricinfo.com"
@@ -59,16 +63,29 @@ def getMatches(soup):
     return matches
 
 
-@sched.scheduled_job('interval', minutes=1)
+@sched.scheduled_job('interval', minutes=0.5)
+@app.before_first_request
+def cron():
+    global results
+    try:
+        if results is not None:
+            global previous_results
+            previous_results = results
+        soup = getHTML(URL)
+        matches = getMatches(soup)
+        results = json.dumps(matches, indent=4, sort_keys=True)
+    except:
+        results = "Try again in few minutes"
+
+
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    soup = getHTML(URL)
-    matches = getMatches(soup)
-    results = json.dumps(matches, indent=4, sort_keys=True)
+    if results is None:
+        return previous_results
     return results
 
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    sched.start()
+    app.run()
     app.run(host='0.0.0.0', port=port)
