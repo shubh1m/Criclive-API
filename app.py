@@ -7,8 +7,8 @@ import os
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
-sched = BackgroundScheduler()
-sched.start()
+#sched = BackgroundScheduler()
+#sched.start()
 results = None
 previous_results = None
 
@@ -62,7 +62,7 @@ def getMatches(soup):
     return matches
 
 
-@sched.scheduled_job('interval', minutes=0.5)
+#@sched.scheduled_job('interval', minutes=0.5)
 @app.before_first_request
 def cron():
     global results
@@ -86,4 +86,6 @@ def main():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+    #cron()
+    #sched.start()
     app.run(host='0.0.0.0', port=port)
